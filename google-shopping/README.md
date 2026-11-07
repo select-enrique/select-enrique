@@ -1,19 +1,34 @@
-# Google Shopping – 3 ofertas mais baratas
+# Google Shopping – 3 ofertas mais baratas (template DDL)
 
-Notebook do Google Colab que lê uma lista de itens numa **Google Sheets**, busca cada item no **Google Shopping (Brasil)** e grava as **3 ofertas mais baratas** de cada um numa aba `Resultados`.
+Notebook do Google Colab que lê os itens **selecionados** da aba **Entrega** do template DDL, busca cada um no **Google Shopping (Brasil)** e grava as **3 ofertas mais baratas** numa aba nova, **Google Shopping**, na mesma planilha.
 
 ## Como usar
-1. Abra `google_shopping_mais_baratos.ipynb` no [Google Colab](https://colab.research.google.com) (Arquivo → Fazer upload de notebook, ou abrir direto do GitHub).
-2. Na planilha, crie uma aba `Itens` com o cabeçalho `Item` e um nome de produto por linha (ex.: `Kit Principia Essencial`).
-3. Na célula **⚙️ Configuração**, cole o link da planilha.
-4. **Ambiente de execução → Executar tudo** e autorize sua conta Google.
+1. Abra `google_shopping_mais_baratos.ipynb` no [Google Colab](https://colab.research.google.com) (Arquivo → Fazer upload de notebook).
+2. Na célula **⚙️ Configuração**, cole o link da planilha (cada campanha tem um link diferente, mas o template é o mesmo).
+3. **Ambiente de execução → Executar tudo** e autorize sua conta Google.
 
-## Resultado (aba `Resultados`)
-| Item | Posição | Preço (R$) | Loja | Título do anúncio | Link | Status |
-|---|---|---|---|---|---|---|
+## Regras
+- Busca as linhas com `Selecionado?` preenchido e diferente de `No`.
+- Variações com o mesmo `Item ID` são buscadas uma única vez, usando o `Item Name`.
+- As colunas são localizadas pelo **nome do cabeçalho** (linha 4), não pela letra. Se o template mudar, ajuste só a célula "Estrutura do template".
+- A aba **Entrega** não é alterada.
+
+## Resultado (aba `Google Shopping`)
+| Item ID | Item Name | Shop Name | Final Price (Shopee) | Posição | Preço Google (R$) | Loja | Título do anúncio | Link | Status | Atualizado em |
+|---|---|---|---|---|---|---|---|---|---|---|
+
+## Organização do código
+| Célula | Responsabilidade |
+|---|---|
+| Configuração | Único lugar que o usuário altera |
+| Estrutura do template | Nomes de abas, colunas e status |
+| Modelos de dados | `Item`, `Oferta`, `ResultadoBusca` |
+| Planilha | Ler itens selecionados e gravar resultado |
+| Busca | Abrir o Google Shopping e extrair ofertas |
+| Orquestração | Juntar tudo, pular itens concluídos e tratar o captcha |
 
 ## Limitações
-- É raspagem direta: o Google pode mostrar **captcha** após muitas buscas. O item fica `BLOQUEADO`; espere alguns minutos e rode a célula 4 de novo (itens já `OK` são pulados).
-- Se o Google mudar o layout da página, a extração pode precisar de ajuste (função `EXTRAIR_JS`).
-- Alguns links podem ser do próprio Google (anúncio ou página do produto), que redirecionam para a loja.
-- `FILTRAR_TITULO = True` descarta anúncios cujo título não contém a maioria das palavras do item (evita produtos errados). Desligue se estiver vindo `SEM RESULTADO` demais.
+- É raspagem direta: o Google pode pedir **captcha**. A busca para e os itens restantes ficam `PENDENTE`. Rode de novo mais tarde; os itens `OK` são mantidos.
+- Se o Google mudar o layout, pode ser preciso ajustar `JS_EXTRAIR_CARDS`.
+- Alguns links são do próprio Google (anúncio ou página do produto) e redirecionam para a loja.
+- Nomes muito longos da Shopee podem reduzir os resultados. Se aparecer muito `SEM RESULTADO`, teste `FILTRAR_TITULO = False`.
