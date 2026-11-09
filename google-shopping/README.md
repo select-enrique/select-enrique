@@ -88,6 +88,6 @@ Rodando de novo, os itens já `OK` são mantidos e só os pendentes são buscado
 
 ## Problemas comuns
 - **`credentials.json não encontrado`**: veja a seção 2.
-- **`Coluna(s) não encontrada(s)`**: a planilha não segue o template (aba `Entrega`, cabeçalho na linha 4).
+- **`Cabeçalho não encontrado`**: a aba `Entrega` não tem as colunas `Selecionado?`, `Item ID`, `Item Name`, `Shop Name` e `Final Price` nas 10 primeiras linhas.
 - **`403` / sem permissão**: a conta usada no login não tem acesso de edição à planilha.
 - **`Acesso bloqueado: app não verificado`**: adicione seu e-mail em **Usuários de teste** (seção 2, passo 3).

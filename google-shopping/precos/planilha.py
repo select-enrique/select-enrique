@@ -5,17 +5,31 @@ from datetime import datetime
 import gspread
 
 from .modelos import Item
-from .template import (ABA_DESTINO, ABA_ORIGEM, COLUNAS_DESTINO, LINHA_CABECALHO,
+from .template import (ABA_DESTINO, ABA_ORIGEM, COLUNAS_DESTINO, MAX_LINHAS_ATE_CABECALHO,
                        VALOR_NAO_SELECIONADO, ColunaOrigem, Status)
 
 
+def _limpar(celulas):
+    return [c.strip() for c in celulas]
+
+
+def encontrar_linha_cabecalho(linhas, nomes):
+    """Índice da primeira linha que contém todas as colunas esperadas.
+
+    A posição do cabeçalho muda entre versões do template (linha 1, linha 4...),
+    por isso ele é procurado em vez de fixado.
+    """
+    for indice, linha in enumerate(linhas[:MAX_LINHAS_ATE_CABECALHO]):
+        if set(nomes) <= set(_limpar(linha)):
+            return indice
+    raise ValueError(
+        f"Cabeçalho não encontrado nas {MAX_LINHAS_ATE_CABECALHO} primeiras linhas da aba "
+        f"'{ABA_ORIGEM}'. Colunas esperadas: {nomes}")
+
+
 def localizar_colunas(cabecalho, nomes):
-    """Devolve {nome: índice} e avisa claramente se alguma coluna sumiu do template."""
-    cabecalho_limpo = [c.strip() for c in cabecalho]
-    faltando = [n for n in nomes if n not in cabecalho_limpo]
-    if faltando:
-        raise ValueError(f"Coluna(s) não encontrada(s) na linha {LINHA_CABECALHO} da aba "
-                         f"'{ABA_ORIGEM}': {faltando}")
+    """Devolve {nome da coluna: índice}."""
+    cabecalho_limpo = _limpar(cabecalho)
     return {n: cabecalho_limpo.index(n) for n in nomes}
 
 
@@ -35,7 +49,8 @@ def esta_selecionado(valor):
 def ler_itens_selecionados(planilha):
     """Itens com 'Selecionado?' preenchido e diferente de 'No', sem repetir Item ID."""
     linhas = planilha.worksheet(ABA_ORIGEM).get_values()
-    cabecalho, dados = linhas[LINHA_CABECALHO - 1], linhas[LINHA_CABECALHO:]
+    i_cabecalho = encontrar_linha_cabecalho(linhas, ColunaOrigem.todas())
+    cabecalho, dados = linhas[i_cabecalho], linhas[i_cabecalho + 1:]
     col = localizar_colunas(cabecalho, ColunaOrigem.todas())
 
     itens = {}

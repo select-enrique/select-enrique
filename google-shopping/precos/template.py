@@ -1,7 +1,7 @@
 """Estrutura fixa do template DDL. Só mude se o template mudar."""
 
 ABA_ORIGEM      = "Entrega"
-LINHA_CABECALHO = 4                  # linha onde ficam os nomes das colunas
+MAX_LINHAS_ATE_CABECALHO = 10        # o cabeçalho é procurado nas primeiras linhas da aba
 ABA_DESTINO     = "Google Shopping"  # criada automaticamente se não existir
 
 VALOR_NAO_SELECIONADO = "No"
